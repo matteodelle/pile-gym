@@ -1144,6 +1144,8 @@ var PileBar;
             this.thumbnails.sort(function (a, b) {
                 return a.sem - b.sem;
             });
+            for (var i = 0; i < this.thumbnails.length; i++)
+                this.thumbnails[i].index = i;
             this.refresh(true);
         };
         Object.defineProperty(PileBar.prototype, "testDotDiv", {
@@ -1448,6 +1450,11 @@ var PileBar;
                         var t = new PileBar.Thumbnail(base + shots[i].getAttribute('thumbnail'), base + shots[i].getAttribute('colormap'), Number(shots[i].getAttribute('sem')), i);
                         thumbnails.push(t);
                     }
+                    thumbnails.sort(function (a, b) {
+                        return a.sem - b.sem;
+                    });
+                    for (var i = 0; i < thumbnails.length; i++)
+                        thumbnails[i].index = i;
                     if (callback)
                         callback(thumbnails, metadata);
                 }

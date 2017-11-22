@@ -582,6 +582,8 @@ module PileBar {
 			this.thumbnails.sort(function(a, b) {
 				return a.sem - b.sem;
 			})
+			for (let i = 0; i < this.thumbnails.length; i++)
+				this.thumbnails[i].index = i;
             this.refresh(true);   
 			//this.refocus(this.index);		
         }

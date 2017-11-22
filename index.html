@@ -76,7 +76,7 @@ initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0">
         var gui = new dat.GUI();
 
         var tmp = gui.add(guiData, 'src', {
-            Piazza_Cav: 0,
+            Piazza_Cavalieri: 0,
             David: 1
         })
 
@@ -168,6 +168,10 @@ initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0">
                 bar.toggleSEM();
 			else if (key == 85) { //U
                 bar.updateSem();
+				//PileBar.Utils.readPxi(datasets[1].pxi, function (data) {
+                //bar.thumbnails = data;
+				//bar.updateSem();
+				//}, datasets[1].base);
 				}
             else if (key == 76) { //L
                 guiData.direction = bar.toggleLookingDirection();

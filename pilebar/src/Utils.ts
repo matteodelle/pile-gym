@@ -31,6 +31,14 @@ module PileBar {
                         );
                         thumbnails.push(t);
                     }
+					
+					//// Sorting by sem, added
+					thumbnails.sort(function(a, b) {
+						return a.sem - b.sem;
+					})
+					for (let i = 0; i < thumbnails.length; i++)
+						thumbnails[i].index = i;
+					//////////
 
                     if (callback)
                         callback(thumbnails,metadata);
