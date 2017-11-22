@@ -1,0 +1,24 @@
+{
+    "compilerOptions": {
+     //   "module": "commonjs",
+        "noImplicitAny": true,
+        "noImplicitUseStrict": true,
+        "removeComments": true,
+        "preserveConstEnums": true,
+        "suppressImplicitAnyIndexErrors": true,
+        "sourceMap": true,
+        "rootDir": "src/",
+        "outDir": "build",
+        "outFile": "build/pilebar.js",
+        "target": "es5",
+        "watch": true
+    },
+    "exclude": [
+        "build"
+    ],
+    "compileOnSave": true,
+    "buildOnSave": true,
+    "atom": {
+        "rewriteTsconfig": false
+    }
+}

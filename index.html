@@ -1,0 +1,295 @@
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, user-scalable=no,
+initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0">
+    <script src="./assets/lib/dat.gui.min.js"></script>
+    <script src="./pilebar/build/pilebar.js"></script>
+
+    <link rel="stylesheet" href="./assets/style/spinners.css">
+    <link rel="stylesheet" href="./assets/style/dat.gui.css">
+    <style>
+        body {
+            background-color: black;
+        }
+        /*
+        .pile {
+            border:1px solid red;
+        }
+        */
+        
+        .peeker {
+            background-color: green;
+        }
+        
+        .peeker-fade {
+            background-color: blue;
+        }
+        
+        .test-div {
+            background-color: red;
+            z-index: 1000;
+        }
+        
+        .floating-pile {
+            background: green;
+            border: 2px solid blue;
+        }
+        
+    </style>
+</head>
+
+<body class="">
+    <div id="thumb-bar" style="width:85%; height:40%; position:fixed; bottom:5%; margin-left:auto; left:10; right:10; margin-right:auto;">
+</div>
+
+
+</body>
+
+<script>
+    var datasets = [
+        {
+            pxi: './assets/PiazzaCavalieri/PiazzaCavalieri_synth_highres.pxi',
+            base: './assets/PiazzaCavalieri/'
+        },
+        {
+            pxi: './assets/David/David.pxi',
+            base: './assets/David/'
+        }
+    ];
+
+    function init(data) {
+        //  console.log(data);
+        var container = document.getElementById('thumb-bar');
+        PILEBAR = bar = new PileBar.PileBar(data, container);
+
+        var guiData = {
+            src: 0,
+            direction: bar.layout.lookingDirection,
+            speed: bar.animationSpeed,
+            event: '',
+            layout: 0,
+            debug: false
+            /* */
+        };
+
+        var gui = new dat.GUI();
+
+        var tmp = gui.add(guiData, 'src', {
+            Piazza_Cav: 0,
+            David: 1
+        })
+
+        tmp.onChange(function (value) {
+            PileBar.Utils.readPxi(datasets[value].pxi, function (data) {
+                bar.thumbnails = data;
+            }, datasets[value].base);
+        });
+
+        tmp = gui.add(guiData, 'direction', {
+            OUT: true,
+            IN: false
+        });
+
+        tmp.onChange(function (value) {
+            bar.toggleLookingDirection(value == 'true');
+            console.log('val', value);
+        });
+
+
+        tmp = gui.add(guiData, 'speed', 0, 1)
+
+        tmp.onChange(function (value) {
+            bar.animationSpeed = value;
+        });
+
+        tmp = gui.add(guiData, 'event');
+        tmp.listen();
+
+        var events = ['refocus_start', 'refocus_done', 'refresh_start', 'refresh_done'];
+
+        for (var i = 0; i < events.length; i++)
+            (function (e) {
+                bar.addEventListener(e, function (event) {
+                    guiData.event = e;
+                    console.log(e);
+                });
+            })(events[i]);
+
+        bar.addEventListener('refocus_notify', function (event) {
+            guiData.event = 'refocus_notify: ' + event.detail.percent;
+        });
+
+        tmp = gui.add(guiData, 'layout', {
+            TypeA: 0,
+            TypeB: 1,
+            TypeC: 2
+        });
+
+        tmp.onChange(function (value) {
+            if (value == 0)
+                bar.layout = PileBar.ScalingLayout.buildDemo(bar);
+            else if (value == 1)
+                bar.layout = PileBar.ResponsiveLayout.buildDemo(bar);
+            else if (value == 2)
+                bar.layout = PileBar.SuperAwesomeLayout.buildDemo(bar);
+        });
+
+        tmp = gui.add(guiData, 'debug', {
+            on: true,
+            off: false
+        });
+
+        tmp.onChange(function (value) {
+            PileBar.PileBar.DEBUG = value == 'true';
+            bar.refresh();
+        });
+
+        tmp.listen();
+
+
+
+        var ignoreKeypress = false;
+
+        document.onkeydown = function (event) {
+            //  var key = IS_FIREFOX ? event.which : event.keyCode;
+            var key = event.which || event.keyCode;
+            //     console.log('key: ', key);
+
+            if (ignoreKeypress == true) return;
+
+            if (key == 65 || key == 37) //A <-
+                bar.skip(1);
+            else if (key == 68 || key == 39) //D ->
+                bar.skip(-1);
+            else if (key == 70) //F
+                bar.toggleAnimation(); // = !self.stopStacksAnimation;
+            else if (key == 84) //T
+                bar.toggleSEM();
+			else if (key == 85) { //U
+                bar.updateSem();
+				}
+            else if (key == 76) { //L
+                guiData.direction = bar.toggleLookingDirection();
+            }
+            else return;
+
+            ignoreKeypress = true;
+            setTimeout(function () {
+                ignoreKeypress = false;
+            }, 50);
+
+        };
+
+
+
+    }
+    PileBar.Utils.readPxi(datasets[0].pxi, init, datasets[0].base);
+</script>
+
+<!--script>
+
+        function createThumbar(data) {
+
+
+
+
+
+
+
+            var spinner = document.getElementById('spinner');
+            spinner.style.display = 'none';
+            var img = new Image();
+            var imgUrl;
+            img.addEventListener('load', function () {
+                return;
+                document.body.style.backgroundImage = 'url(' + imgUrl + ')';
+                spinner.style.display = 'none';
+            });
+
+            t.addEventListener('focus_changed', function (t) {
+                return;
+                //   console.log(t);
+
+                /**REMOVE THIS */
+                spinner.style.display = 'none';
+                return;
+                /********/
+
+                img.src = imgUrl = t.imageUrl;
+                spinner.style.display = null;
+                document.body.style.backgroundImage = 'url(' + t.thumbnailUrl + ')';
+                document.body.currentIndex = t.index;
+                document.body.style.backgroundSize = 'cover';
+
+            });
+            t.refocus(null, null, true);
+
+            THUMBAR = t;
+
+        }
+
+        var bbb = getUrlVars()['bbb'];
+        if (!bbb)
+            readPxi('./PiazzaCavalieri_synth_highres.pxi', createThumbar, 'http://vcg.isti.cnr.it/~brivio/PhotoCloud/PiazzaCavalieri/');
+        else {
+            var bbbt = [];
+            var l = 1;
+            var lz = '00000';
+            for (var i = 1; i <= 14315; i++){
+                l = i<Math.pow(10,l) ? l : l+1;
+
+                bbbt.push({
+                    image: 'https://media.xiph.org/BBB/BBB-360-png/big_buck_bunny_' + lz.substr(l)+i + '.png',
+                    thumbnail: 'http://pt-slepoi.pancakeapps.com/bbb_thumbnails/bbb_' + i + '.jpg',
+                    sem: i
+                });}
+
+            createThumbar(bbbt);
+        }
+
+
+    };
+
+    init();
+
+    if (JSON.parse(localStorage.getItem('debug')))
+        document.body.classList.add('debug');
+
+    function press(char) {
+        console.log('pressing ' + char);
+        var e = document.createEvent('Event'); // new KeyboardEvent('keypress',{key:char,char:char});
+        document.getElementById('thumb-bar').dispatchEvent(e);
+    }
+    document.addEventListener('keypress', function (event) {
+        var key = IS_FIREFOX ? event.charCode : event.keyCode;
+        if (key === 120) {
+            document.body.classList.toggle('debug');
+            localStorage.setItem('debug', document.body.classList.contains('debug'));
+        } else if (key === 112) {
+            document.getElementById('spinner').setAttribute('class', 'pong-loader');
+        }
+        /*else if(key === 98){ //98 ==b
+                    document.getElementById('spinner').setAttribute('class','pong-loader');
+                }*/
+    });
+
+    setInterval(function () {
+        document.getElementsByTagName('div').forEach(function (e) {
+            e.setAttribute('data-zIndex', e.style.zIndex);
+        });
+    }, 150);
+
+    var n = 1;
+    setInterval(function () {
+        var m = document.getElementsByTagName('div').length;
+        if (m <= n) return;
+
+        n = m;
+        console.log('MAX DIVS: ', n);
+    }, 1000);-->
+
+</html>
+
+<!--
+http://plnkr.co/edit/vnUvs3VH2LTFAyDZSame?p=preview-->
